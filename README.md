@@ -1,2 +1,2 @@
 # Naive Bayesian Classifier Algorithm
-### Nathan Englehart
+### Nathan Englehart (Autumn 2021)
