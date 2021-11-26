@@ -1,3 +1,3 @@
-# Naive Bayesian Classifier Algorithm
+## Naive Bayesian Classifier Algorithm
 ### Nathan Englehart
 Gaussian naive bayesian classifier implemented in C++. 
