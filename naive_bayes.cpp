@@ -5,16 +5,7 @@
 #include <vector>
 #include <map>
 
-/*
- * Naive Bayes Classifier
- *
- * Nathan Englehart, Autumn 2021
- *
- *
- *
- *
- *
- */
+/* Naive Bayes Classifier by Nathan Englehart, Autumn 2021 */
 
  int len(const Eigen::VectorXd& vector)
  {
@@ -258,7 +249,7 @@ std::map<int, std::vector<std::vector<double>>> summarize_by_classification(Eige
 std::map<int, double> calculate_classification_probabilities(std::map<int, std::vector<std::vector<double>>> summaries, Eigen::VectorXd row, int size)
 {
 
-  /* Calculates the classification probabilities for a single vector. */
+  /* Calculates the classification probabilities for a single vector using P(A|B) = P(B|A) * P(A), which is derived from Bayes Theorem, for each classification. */
 
   std::map<int, double> probabilities;
   std::map<int, std::vector<std::vector<double>>>::iterator it;
@@ -267,14 +258,14 @@ std::map<int, double> calculate_classification_probabilities(std::map<int, std::
   for(it=summaries.begin(); it != summaries.end(); ++it)
   {
     std::vector<std::vector<double>> entry = it->second;
-    probabilities[classification_value] = double_vector_list_lookup<double>(entry,0,2) / size;
+    probabilities[classification_value] = double_vector_list_lookup<double>(entry,0,2) / size; // P(A)
 
     for(int i = 1; i < row.size(); i++)
     {
       double mean = double_vector_list_lookup<double>(entry,i,0);
       double standard_deviation = double_vector_list_lookup<double>(entry,i,1);
       double x = get_eigen_index<double>(row,i);
-      probabilities[classification_value] = probabilities[classification_value] * gaussian_pdf(x,mean,standard_deviation);
+      probabilities[classification_value] *= gaussian_pdf(x,mean,standard_deviation); // P(B|A)
     }
     classification_value++;
   }
@@ -284,6 +275,9 @@ std::map<int, double> calculate_classification_probabilities(std::map<int, std::
 
 int predict(std::map<int, std::vector<std::vector<double>>> summaries, Eigen::VectorXd row, int size)
 {
+
+  /* Returns classification prediction. */
+
   std::map<int, double> probabilities = calculate_classification_probabilities(summaries, row, size);
   std::map<int, double>::iterator it;
 
@@ -304,6 +298,9 @@ int predict(std::map<int, std::vector<std::vector<double>>> summaries, Eigen::Ve
 
 std::vector<int> naive_bayes_classifier(Eigen::MatrixXd validation, int validation_size, Eigen::MatrixXd training, int training_size, int length)
 {
+
+  /* Calculates the classification probabilities for each row in dataset and puts their predicted classification in a list. */
+
   std::map<int, std::vector<std::vector<double>>> summaries = summarize_by_classification(training, training_size, length);
   std::vector<int> predictions;
 
