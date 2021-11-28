@@ -335,18 +335,22 @@ std::vector<int> naive_bayes_classifier(Eigen::MatrixXd validation, int validati
   return predictions;
 }
 
-void driver(std::string sys_path)
+void driver(std::string sys_path_test, std::string sys_path_train)
 {
 
   /* Driver for a naive bayes classifier example. */
 
-  Eigen::MatrixXd B = load_csv<Eigen::MatrixXd>(sys_path);
-  std::cout << B << "\n";
+  Eigen::MatrixXd test = load_csv<Eigen::MatrixXd>(sys_path_test);
+  std::cout << test << "\n";
+
+  Eigen::MatrixXd train = load_csv<Eigen::MatrixXd>(sys_path_train);
+  std::cout << train << "\n";
 
 }
 
 int main()
 {
-  driver("/Users/nath/naive-bayes-cpp-241/synthdata.csv");
+  driver("./data/S1test.csv","./data/S1train.csv");
+  driver("./data/S2test.csv","./data/S2train.csv");
   return 0;
 }
