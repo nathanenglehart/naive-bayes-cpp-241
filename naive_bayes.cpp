@@ -4,97 +4,119 @@
 #include <algorithm>
 #include <vector>
 #include <map>
+#include <fstream>
 
 /* Naive Bayes Classifier by Nathan Englehart, Autumn 2021 */
 
- int len(const Eigen::VectorXd& vector)
+template<typename T> T load_csv (const std::string & sys_path)
+{
+
+  /* Loads csv file to Eigen matrix or vector. */
+
+  std::ifstream in;
+  in.open(sys_path);
+  std::string line;
+  std::vector<double> values;
+  uint rows = 0;
+  while (std::getline(in, line)) {
+      std::stringstream lineStream(line);
+      std::string cell;
+      while (std::getline(lineStream, cell, ',')) {
+          values.push_back(std::stod(cell));
+      }
+      rows = rows + 1;
+  }
+  return Eigen::Map<const Eigen::Matrix<typename T::Scalar, T::RowsAtCompileTime, T::ColsAtCompileTime, Eigen::RowMajor>>(values.data(), rows, values.size()/rows);
+}
+
+int len(const Eigen::VectorXd& vector)
+{
+
+ /* Computes the length of an input vector. */
+
+ int sum = 0;
+
+ for(auto v : vector)
  {
+   sum += 1;
+ }
 
-   /* Computes the length of an input vector. */
+ return sum;
+}
 
-   int sum = 0;
+double mean(const Eigen::VectorXd& vector)
+{
 
-   for(auto v : vector)
+ /* Computes the mean of an input vector. */
+
+ return vector.mean();
+}
+
+double standard_deviation(const Eigen::VectorXd& vector)
+{
+
+ /* Computes the standard deviation of an input vector. */
+
+ int size = len(vector)-1;
+ double average = mean(vector);
+ double standard_deviation = 0.0;
+
+ for(auto v : vector)
+ {
+   standard_deviation += pow((v-average), 2);
+ }
+
+ return sqrt((double) (standard_deviation / size));
+}
+
+double gaussian_pdf(double x, double mean, double standard_deviation)
+{
+
+ /* Computes the Gaussian probability distribution function for x. */
+
+ double exponent = exp(-pow((x-mean),2) / (2 * pow(standard_deviation,2)));
+ return (1 / (sqrt(2 * M_PI) * standard_deviation)) * exponent;
+}
+
+template <typename T> T get_eigen_index(Eigen::VectorXd vector, int index)
+{
+
+ /* Returns the value of a vector at the given index. */
+
+ int place = 0;
+ for(auto v : vector)
+ {
+   if(place == index)
    {
-     sum += 1;
+     return v;
    }
-
-   return sum;
+   place++;
  }
+}
 
- double mean(const Eigen::VectorXd& vector)
+template <typename T> T double_vector_list_lookup(std::vector<std::vector<T>> list, int first_index, int second_index)
+{
+
+ /* Finds value located in a double vector list located at first index, second index. */
+
+ int first_count = 0;
+ for(auto v : list)
  {
-
-   /* Computes the mean of an input vector. */
-
-   return vector.mean();
- }
-
- double standard_deviation(const Eigen::VectorXd& vector)
- {
-
-   /* Computes the standard deviation of an input vector. */
-
-   int size = len(vector)-1;
-   double average = mean(vector);
-   double standard_deviation = 0.0;
-
-   for(auto v : vector)
+   if(first_index == first_count)
    {
-     standard_deviation += pow((v-average), 2);
-   }
-
-   return sqrt((double) (standard_deviation / size));
- }
-
- double gaussian_pdf(double x, double mean, double standard_deviation)
- {
-
-   /* Computes the Gaussian probability distribution function for x. */
-
-   double exponent = exp(-pow((x-mean),2) / (2 * pow(standard_deviation,2)));
-   return (1 / (sqrt(2 * M_PI) * standard_deviation)) * exponent;
- }
-
- template <typename T> T get_eigen_index(Eigen::VectorXd vector, int index)
- {
-
-   /* Returns the value of a vector at the given index. */
-
-   int place = 0;
-   for(auto v : vector)
-   {
-     if(place == index)
+     int second_count = 0;
+     for(auto w : v)
      {
-       return v;
-     }
-     place++;
-   }
- }
-
- template <typename T> T double_vector_list_lookup(std::vector<std::vector<T>> list, int first_index, int second_index)
- {
-
-   /* Finds value located in a double vector list located at first index, second index. */
-
-   int first_count = 0;
-   for(auto v : list)
-   {
-     if(first_index == first_count)
-     {
-       int second_count = 0;
-       for(auto w : v)
+       if(second_count == second_index)
        {
-         if(second_count == second_index)
-         {
-           return w;
-         }
-         second_count++;
+         return w;
        }
+       second_count++;
      }
-     first_count++;
    }
+   first_count++;
  }
+}
 
 bool compare_classification(const Eigen::VectorXd& l, const Eigen::VectorXd& r)
 {
@@ -313,7 +335,18 @@ std::vector<int> naive_bayes_classifier(Eigen::MatrixXd validation, int validati
   return predictions;
 }
 
+void driver(std::string sys_path)
+{
+
+  /* Driver for a naive bayes classifier example. */
+
+  Eigen::MatrixXd B = load_csv<Eigen::MatrixXd>(sys_path);
+  std::cout << B << "\n";
+
+}
+
 int main()
 {
+  driver("/Users/nath/naive-bayes-cpp-241/synthdata.csv");
   return 0;
 }
