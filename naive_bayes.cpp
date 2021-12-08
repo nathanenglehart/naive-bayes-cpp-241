@@ -1,33 +1,13 @@
 #include <iostream>
 #include <cmath>
-#include "includes/eigen3/Eigen/Dense"
 #include <algorithm>
 #include <vector>
 #include <map>
 #include <fstream>
+#include "includes/eigen3/Eigen/Dense"
+#include "includes/utils.h"
 
-/* Naive Bayes Classifier by Nathan Englehart, Autumn 2021 */
-
-template<typename T> T load_csv (const std::string & sys_path)
-{
-
-  /* Loads csv file to Eigen matrix or vector. */
-
-  std::ifstream in;
-  in.open(sys_path);
-  std::string line;
-  std::vector<double> values;
-  uint rows = 0;
-  while (std::getline(in, line)) {
-      std::stringstream lineStream(line);
-      std::string cell;
-      while (std::getline(lineStream, cell, ',')) {
-          values.push_back(std::stod(cell));
-      }
-      rows = rows + 1;
-  }
-  return Eigen::Map<const Eigen::Matrix<typename T::Scalar, T::RowsAtCompileTime, T::ColsAtCompileTime, Eigen::RowMajor>>(values.data(), rows, values.size()/rows);
-}
+/* Nathan Englehart, Xuhang Cao, Samuel Topper, Ishaq Kothari (Autumn 2021) */
 
 int len(const Eigen::VectorXd& vector)
 {
@@ -78,80 +58,6 @@ double gaussian_pdf(double x, double mean, double standard_deviation)
  return (1 / (sqrt(2 * M_PI) * standard_deviation)) * exponent;
 }
 
-template <typename T> T get_eigen_index(Eigen::VectorXd vector, int index)
-{
-
- /* Returns the value of a vector at the given index. */
-
- int place = 0;
- for(auto v : vector)
- {
-   if(place == index)
-   {
-     return v;
-   }
-   place++;
- }
-
- exit(1);
-}
-
-template <typename T> T double_vector_list_lookup(std::vector<std::vector<T>> list, int first_index, int second_index)
-{
-
- /* Finds value located in a double vector list located at first index, second index. */
-
- int first_count = 0;
- for(auto v : list)
- {
-   if(first_index == first_count)
-   {
-     int second_count = 0;
-     for(auto w : v)
-     {
-       if(second_count == second_index)
-       {
-         return w;
-       }
-       second_count++;
-     }
-   }
-   first_count++;
- }
-
- exit(1);
-}
-
-bool compare_classification(const Eigen::VectorXd& l, const Eigen::VectorXd& r)
-{
-
-  /* Compares the first index of one vector to the first index of another vector. */
-
-  return l(0) < r(0);
-}
-
-Eigen::MatrixXd sorted_rows_by_classification(Eigen::MatrixXd X)
-{
-
-  /* Sorts the input matrix according to the first column entry. */
-
-  std::vector<Eigen::VectorXd> vec;
-
-  for(int64_t i = 0; i < X.rows(); ++i)
-  {
-    vec.push_back(X.row(i));
-  }
-
-  std::sort(vec.begin(), vec.end(), &compare_classification);
-
-  for(int64_t i = 0; i < X.rows(); ++i)
-  {
-    X.row(i) = vec[i];
-  }
-
-  return X;
-}
-
 std::vector<int> class_indicies(Eigen::MatrixXd X, int size)
 {
 
@@ -163,13 +69,13 @@ std::vector<int> class_indicies(Eigen::MatrixXd X, int size)
   indicies.push_back(0);
 
   Eigen::VectorXd row = X.row(0);
-  int prev_classification = get_eigen_index<int>(row,0);
+  int prev_classification = (int) get_eigen_index(row,0);
 
   for(int i = 1; i < size; i++)
   {
     idx++;
     Eigen::VectorXd row = X.row(i);
-    int classification = get_eigen_index<int>(row,0);
+    int classification = (int) get_eigen_index(row,0);
     if(classification != prev_classification)
     {
       indicies.push_back(idx);
@@ -272,7 +178,7 @@ std::map<int, std::vector<std::vector<double>>> summarize_by_classification(Eige
   return ret;
 }
 
-std::map<int, double> calculate_classification_probabilities(std::map<int, std::vector<std::vector<double>>> summaries, Eigen::VectorXd row, int size)
+std::map<int, double> calculate_classification_probabilities(std::map<int, std::vector<std::vector<double>>> summaries, Eigen::VectorXd row, int size, bool verbose)
 {
 
   /* Calculates the classification probabilities for a single vector using P(A|B) = P(B|A) * P(A), which is derived from Bayes Theorem, for each classification. */
@@ -281,30 +187,52 @@ std::map<int, double> calculate_classification_probabilities(std::map<int, std::
   std::map<int, std::vector<std::vector<double>>>::iterator it;
   int classification_value = 0;
 
+  if(verbose == true)
+  {
+    std::cout << "Row: ";
+    for(auto v : row)
+    {
+      std::cout << v << " ";
+    }
+
+  }
+
   for(it=summaries.begin(); it != summaries.end(); ++it)
   {
+
     std::vector<std::vector<double>> entry = it->second;
-    probabilities[classification_value] = double_vector_list_lookup<double>(entry,0,2) / size; // P(A)
+    probabilities[classification_value] = double_vector_list_lookup(entry,0,2) / size; // P(A)
 
     for(int i = 1; i < row.size(); i++)
     {
-      double mean = double_vector_list_lookup<double>(entry,i,0);
-      double standard_deviation = double_vector_list_lookup<double>(entry,i,1);
-      double x = get_eigen_index<double>(row,i);
+      double mean = double_vector_list_lookup(entry,i,0);
+      double standard_deviation = double_vector_list_lookup(entry,i,1);
+      double x = get_eigen_index(row,i);
       probabilities[classification_value] *= gaussian_pdf(x,mean,standard_deviation); // P(B|A)
     }
+
+    if(verbose == true)
+    {
+      std::cout << " Class: " << classification_value << " Probability: " << probabilities[classification_value];
+    }
+
     classification_value++;
+  }
+
+  if(verbose == true)
+  {
+    std::cout << "\n";
   }
 
   return probabilities;
 }
 
-int predict(std::map<int, std::vector<std::vector<double>>> summaries, Eigen::VectorXd row, int size)
+int predict(std::map<int, std::vector<std::vector<double>>> summaries, Eigen::VectorXd row, int size, bool verbose)
 {
 
   /* Returns classification prediction. */
 
-  std::map<int, double> probabilities = calculate_classification_probabilities(summaries, row, size);
+  std::map<int, double> probabilities = calculate_classification_probabilities(summaries, row, size, verbose);
   std::map<int, double>::iterator it;
 
   int best_label = -1;
@@ -322,7 +250,7 @@ int predict(std::map<int, std::vector<std::vector<double>>> summaries, Eigen::Ve
   return best_label;
 }
 
-std::vector<int> naive_bayes_classifier(Eigen::MatrixXd validation, int validation_size, Eigen::MatrixXd training, int training_size, int length)
+std::vector<int> naive_bayes_classifier(Eigen::MatrixXd validation, int validation_size, Eigen::MatrixXd training, int training_size, int length, bool verbose)
 {
 
   /* Calculates the classification probabilities for each row in dataset and puts their predicted classification in a list. */
@@ -332,29 +260,9 @@ std::vector<int> naive_bayes_classifier(Eigen::MatrixXd validation, int validati
 
   for(int i = 0; i < validation_size; i++)
   {
-    int output = predict(summaries, validation.row(i), validation_size);
+    int output = predict(summaries, validation.row(i), validation_size, verbose);
     predictions.push_back(output);
   }
 
   return predictions;
-}
-
-void driver(std::string sys_path_test, std::string sys_path_train)
-{
-
-  /* Driver for a naive bayes classifier example. */
-
-  Eigen::MatrixXd test = load_csv<Eigen::MatrixXd>(sys_path_test);
-  std::cout << test << "\n";
-
-  Eigen::MatrixXd train = load_csv<Eigen::MatrixXd>(sys_path_train);
-  std::cout << train << "\n";
-
-}
-
-int main()
-{
-  driver("./data/S1test.csv","./data/S1train.csv");
-  driver("./data/S2test.csv","./data/S2train.csv");
-  return 0;
 }
