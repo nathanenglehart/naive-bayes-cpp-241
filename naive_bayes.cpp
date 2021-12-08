@@ -1,6 +1,6 @@
 #include <iostream>
 #include <cmath>
-#include "eigen3/Eigen/Dense"
+#include "includes/eigen3/Eigen/Dense"
 #include <algorithm>
 #include <vector>
 #include <map>
@@ -92,6 +92,8 @@ template <typename T> T get_eigen_index(Eigen::VectorXd vector, int index)
    }
    place++;
  }
+
+ exit(1);
 }
 
 template <typename T> T double_vector_list_lookup(std::vector<std::vector<T>> list, int first_index, int second_index)
@@ -116,6 +118,8 @@ template <typename T> T double_vector_list_lookup(std::vector<std::vector<T>> li
    }
    first_count++;
  }
+
+ exit(1);
 }
 
 bool compare_classification(const Eigen::VectorXd& l, const Eigen::VectorXd& r)
