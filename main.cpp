@@ -131,7 +131,7 @@ int main(int argc, char ** argv)
   {
     if(valid_filepath(argv[1]) && valid_filepath(argv[2]))
     {
-      driver(argv[2],argv[1],true);
+      driver(argv[2],argv[1],false);
       return 0;
     } else if(!valid_filepath(argv[1]))
     {
