@@ -8,6 +8,30 @@
 
 /* Nathan Englehart, Xuhang Cao, Samuel Topper, Ishaq Kothari (Autumn 2021) */
 
+float round(float number)
+{
+
+  /* Rounds number to 4 decimal points. */
+
+  float ret = (int) (number * 10000 + .5);
+  return (float) ret / 10000;
+}
+
+
+bool valid_filepath(const std::string & sys_path)
+{
+
+  /* Determines whether a system filepath is valid. */
+
+  std::ifstream test(sys_path);
+  if(!test)
+  {
+    return false;
+  }
+
+  return true;
+}
+
 double get_eigen_index(Eigen::VectorXd vector, int index)
 {
 
