@@ -40,6 +40,12 @@ cp naive-bayes-cli /usr/local/bin/naive-bayes-cli
 chmod 0755 /usr/local/bin/naive-bayes-cli
 ```
 
+The program can then be run from any location on your system, as in the below.
+
+```
+naive-bayes-cli [train] [test] [options...]
+```
+
 ## Uninstall
 To uninstall this program from your system, run the following.
 
