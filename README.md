@@ -29,6 +29,24 @@ To run this program in verbose mode, please run:
 ./naive-bayes-cli [train] [test] -v 
 ```
 
+## Install
+To install this program to your posix standard system, please run the following.
+
+```
+git clone git@github.com:nathanenglehart/naive-bayes-cpp-241.git
+cd naive-bayes-cpp-241
+make
+cp /usr/local/bin/naive-bayes-cli
+chmod 0755 /usr/local/bin/naive-bayes-cli
+```
+
+## Uninstall
+To uninstall this program from your system, run the following.
+
+```
+rm /usr/local/bin/naive-bayes-cli
+```
+
 ## Notes
 This is currently a work in progress. We are currently including the eigen3 linear algebra library folder within this program.
 
