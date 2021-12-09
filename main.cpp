@@ -85,6 +85,7 @@ int main(int argc, char ** argv)
 
     if(argc == 1)
     {
+      std::cout << "No arguments supplied.\n";
       std::cout << "Usage: ./naive-bayes-cli [train] [test] [options ..]\n";
       std::cout << "More info with: \"./naive-bayes-cli -h\"\n";
       return 1;
@@ -115,10 +116,12 @@ int main(int argc, char ** argv)
       } else if(!valid_filepath(argv[1]))
       {
         std::cout << "Invalid filepath: " << argv[1] << "\n";
+        std::cout << "Usage: ./naive-bayes-cli [train] [test] [options ..]\n";
         return 1;
       } else if(!valid_filepath(argv[2]))
       {
         std::cout << "Invalid filepath: " << argv[2] << "\n";
+        std::cout << "Usage: ./naive-bayes-cli [train] [test] [options ..]\n";
         return 1;
       }
     } else
@@ -136,10 +139,12 @@ int main(int argc, char ** argv)
     } else if(!valid_filepath(argv[1]))
     {
       std::cout << "Invalid filepath: " << argv[1] << "\n";
+      std::cout << "Usage: ./naive-bayes-cli [train] [test] [options ..]\n";
       return 1;
     } else if(!valid_filepath(argv[2]))
     {
       std::cout << "Invalid filepath: " << argv[2] << "\n";
+      std::cout << "Usage: ./naive-bayes-cli [train] [test] [options ..]\n";
       return 1;
     } else
     {
@@ -149,6 +154,7 @@ int main(int argc, char ** argv)
     }
   } else
   {
+    std::cout << "Too many arguments supplied.\n";
     std::cout << "Usage: ./naive-bayes-cli [train] [test] [options ..]\n";
     std::cout << "More info with: \"./naive-bayes-cli -h\"\n";
     return 1;
