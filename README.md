@@ -36,8 +36,8 @@ To install this program to your posix standard system, please run the following.
 git clone git@github.com:nathanenglehart/naive-bayes-cpp-241.git
 cd naive-bayes-cpp-241
 make
-cp naive-bayes-cli /usr/local/bin/naive-bayes-cli
-chmod 0755 /usr/local/bin/naive-bayes-cli
+sudo cp naive-bayes-cli /usr/local/bin/naive-bayes-cli
+sudo chmod 0755 /usr/local/bin/naive-bayes-cli
 ```
 
 The program can then be run from any location on your system, as in the below.
@@ -50,7 +50,7 @@ naive-bayes-cli [train] [test] [options...]
 To uninstall this program from your system, run the following.
 
 ```
-rm /usr/local/bin/naive-bayes-cli
+sudo rm /usr/local/bin/naive-bayes-cli
 ```
 
 ## Notes
