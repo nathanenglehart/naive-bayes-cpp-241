@@ -9,6 +9,8 @@
 
 /* Nathan Englehart, Xuhang Cao, Samuel Topper, Ishaq Kothari (Autumn 2021) */
 
+int verbose_vector_count = 0;
+
 int len(const Eigen::VectorXd& vector)
 {
 
@@ -189,11 +191,12 @@ std::map<int, double> calculate_classification_probabilities(std::map<int, std::
 
   if(verbose == true)
   {
-    std::cout << "Row: ";
+    std::cout << "Row " << verbose_vector_count++ << ": [ ";
     for(auto v : row)
     {
       std::cout << v << " ";
     }
+    std::cout << "]\n";
 
   }
 
@@ -201,7 +204,7 @@ std::map<int, double> calculate_classification_probabilities(std::map<int, std::
   {
 
     std::vector<std::vector<double>> entry = it->second;
-    probabilities[classification_value] = double_vector_list_lookup(entry,0,2) / size; // P(A)
+    probabilities[classification_value] = double_vector_list_lookup(entry,0,2) / (size); // P(A)
 
     for(int i = 1; i < row.size(); i++)
     {
@@ -213,7 +216,7 @@ std::map<int, double> calculate_classification_probabilities(std::map<int, std::
 
     if(verbose == true)
     {
-      std::cout << " Class: " << classification_value << " Probability: " << probabilities[classification_value];
+      std::cout << "Class: " << classification_value << " Probability: " << probabilities[classification_value] << "\n";
     }
 
     classification_value++;
@@ -260,7 +263,7 @@ std::vector<int> naive_bayes_classifier(Eigen::MatrixXd validation, int validati
 
   for(int i = 0; i < validation_size; i++)
   {
-    int output = predict(summaries, validation.row(i), validation_size, verbose);
+    int output = predict(summaries, validation.row(i), training_size, verbose);
     predictions.push_back(output);
   }
 
