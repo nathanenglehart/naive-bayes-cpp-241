@@ -33,17 +33,6 @@ template<typename T> T load_csv(const std::string & sys_path)
   return Eigen::Map<const Eigen::Matrix<typename T::Scalar, T::RowsAtCompileTime, T::ColsAtCompileTime, Eigen::RowMajor>>(values.data(), rows, values.size()/rows);
 }
 
-bool valid_filepath(const std::string & sys_path)
-{
-  std::ifstream test(sys_path);
-  if(!test)
-  {
-    return false;
-  }
-
-  return true;
-}
-
 void driver(std::string sys_path_test, std::string sys_path_train, bool verbose)
 {
 
@@ -73,7 +62,7 @@ void driver(std::string sys_path_test, std::string sys_path_train, bool verbose)
     int count = 0;
     for(auto v : predictions)
     {
-        std::cout << "Vector " << count << " Classification = " << v << "\n";
+        std::cout << "Row " << count << ": Class = " << v << "\n";
         count++;
     }
     std::cout << "\n";
@@ -82,7 +71,6 @@ void driver(std::string sys_path_test, std::string sys_path_train, bool verbose)
 
 int main(int argc, char ** argv)
 {
-
     if(argc == 1)
     {
       std::cout << "No arguments supplied.\n";
