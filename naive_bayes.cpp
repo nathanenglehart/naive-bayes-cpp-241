@@ -272,11 +272,11 @@ int get_max_feature_label(Eigen::VectorXd col)
 	return max;
 }
 
-int get_argmax(std::vector<double> probabilities)
+int get_argmax(std::vector<long double> probabilities)
 {
 	int idx = 0;
 	int max_idx = 0;
-	int max_prob = probabilities[0];
+	long double max_prob = probabilities[0];
 
 	for(auto v : probabilities)
 	{
@@ -365,7 +365,7 @@ std::vector<int> mle_naive_bayes_classifier(Eigen::MatrixXd validation, int vali
 
   std::vector<Eigen::MatrixXd> list = matricies_by_classification(training, training_size, length);
 
-  std::map<int,std::vector<std::map<int,double>>> dict;
+  std::map<int,std::vector<std::map<int,long double>>> dict;
 
   int current_class = 0;
 
@@ -374,19 +374,19 @@ std::vector<int> mle_naive_bayes_classifier(Eigen::MatrixXd validation, int vali
   	
 	// each iteration corresponds to one classifications individual matrix
 
-  	std::vector<std::map<int,double>> entry; 
+  	std::vector<std::map<int,long double>> entry; 
 	
 	for(int i = 1; i < class_matrix.cols(); i++)
 	{
 
-		std::map<int,double> col_labels;
+		std::map<int,long double> col_labels;
 
 		Eigen::VectorXd feature_column = class_matrix.col(i);
 
 		int max_label = get_max_feature_label(feature_column);
 		std::vector<int> label_counts;
 
-		for(int j = 0; j <= max_label; j++)
+		for(int j = 0; j < max_label; j++)
 		{
 			label_counts.push_back(0);
 		}
@@ -396,7 +396,7 @@ std::vector<int> mle_naive_bayes_classifier(Eigen::MatrixXd validation, int vali
 		
 		int feature_column_length = len(feature_column);
 
-		for(int j = 0; j < feature_column_length; j++)
+		for(int j = 1; j < feature_column_length; j++)
 		{
 			int label = feature_column[j];
 			label_counts[label] += 1;
@@ -404,15 +404,25 @@ std::vector<int> mle_naive_bayes_classifier(Eigen::MatrixXd validation, int vali
 
 		//printf("here 2\n");
 
-		for(int j = 0; j < max_label; j++)
+		for(int j = 1; j < max_label+1; j++)
 		{
-			col_labels[j] = label_counts[j];
+			col_labels[j] = (long double) label_counts[j] / feature_column_length;
 			
 			//entry[i-1][j] = label_counts[j] / feature_column_length; // i-1 because col(0) is the classification column	
 		}
 
 
 		//printf("here 3\n");
+		
+		printf("\ncol_labels for class %d, col %d\n",current_class,i);
+		//std::cout << col_labels;	
+		
+		for (const auto& x : col_labels) {
+        		std::cout << x.first << ": " << x.second << "\n";
+    		}
+
+		printf("\n");
+
 		entry.push_back(col_labels);
 	}
 
@@ -430,26 +440,42 @@ std::vector<int> mle_naive_bayes_classifier(Eigen::MatrixXd validation, int vali
   {
   	Eigen::VectorXd row = validation.row(i);
 
-	std::vector<double> probabilities;
+	std::vector<long double> probabilities;
 	
-	for(int j = 0; j < c; j++)
+	for(int j = 0; j < c+1; j++)
 	{
-		double p_y = unique_classifications_probabilities[j];
+		long double p_y = unique_classifications_probabilities[j];
 
 		//printf("computed p_y\n");
 
-		double p_yx = p_y;
+		long double p_yx = p_y;
 
 		for(int k = 1; k < len(row); k++)
 		{
 			int label = row[k];
 			
-			double p_xy = dict[j][k-1][label];
+			long double p_xy = dict[j][k-1][label];
 			p_yx *= p_xy; 
 		}
 		//printf("got probability\n");
 		probabilities.push_back(p_yx);
+
 	}
+
+	//std::cout << "row:\n" << row << " ";
+	//for(auto v : row)
+	//{
+	//	std::cout << v << " ";
+	//}
+	//printf("\n");
+	int class_num = 0;
+	for(auto v : probabilities)
+	{
+		//std::cout << class_num << ": " << v << "\n";
+		class_num++;
+	}
+	//printf("\n");
+
 
 	// do we need to normalize?
  	 // assign classification using argmax probability 

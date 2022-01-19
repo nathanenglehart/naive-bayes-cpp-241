@@ -72,7 +72,17 @@ void driver(std::string sys_path_test, std::string sys_path_train, bool verbose,
   } else if(mle == true)
   {
 	std::vector<int> predictions = mle_naive_bayes_classifier(test, test.rows(), train, train.rows(), train.cols(),verbose);
-	
+	  	  if(verbose == true)
+  {
+    int count = 0;
+    for(auto v : predictions)
+    {
+        std::cout << "Row " << count << ": Class = " << v << "\n"; // add back after debugging
+        count++;
+    }
+    std::cout << "\n";
+  }
+
   }
 
 
