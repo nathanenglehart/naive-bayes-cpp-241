@@ -71,6 +71,7 @@ void driver(std::string sys_path_test, std::string sys_path_train, bool verbose,
 
   } else if(mle == true)
   {
+	std::vector<int> predictions = mle_naive_bayes_classifier(test, test.rows(), train, train.rows(), train.cols(),verbose);
 	
   }
 

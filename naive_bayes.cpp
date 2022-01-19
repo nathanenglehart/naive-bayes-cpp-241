@@ -255,6 +255,42 @@ int predict(std::map<int, std::vector<std::vector<double>>> summaries, Eigen::Ve
   return best_label;
 }
 
+int get_max_feature_label(Eigen::VectorXd col)
+{
+	/* Returns the maximum feature label from a column */
+
+	int max = 0;
+
+	for(auto v : col)
+	{
+		if(v > max)
+		{
+			max = v;
+		}
+	}
+
+	return max;
+}
+
+int get_argmax(std::vector<double> probabilities)
+{
+	int idx = 0;
+	int max_idx = 0;
+	int max_prob = probabilities[0];
+
+	for(auto v : probabilities)
+	{
+		if(v > max_prob)
+		{
+			max_prob = v;
+			max_idx = idx;
+		}
+		idx++;
+	}
+
+	return max_idx;
+}
+
 std::vector<int> gaussian_naive_bayes_classifier(Eigen::MatrixXd validation, int validation_size, Eigen::MatrixXd training, int training_size, int length, bool verbose)
 {
 
@@ -276,6 +312,11 @@ std::vector<int> mle_naive_bayes_classifier(Eigen::MatrixXd validation, int vali
 {
 
   /* Calculates the classification probabilities for each row in dataset and puts their predicted classification in a list. */
+
+  if(verbose)
+  {
+  	printf("mode 2: mle\n");
+  }
 
 
   std::vector<int> predictions;
@@ -318,38 +359,108 @@ std::vector<int> mle_naive_bayes_classifier(Eigen::MatrixXd validation, int vali
   	unique_classifications_probabilities.push_back(v / total_count);
   }
 
+
+
   // record the features of each vector corresponding to classification
 
-  std::vector<Eigen::MatrixXd> list = matricies_by_classification(Eigen::MatrixXd training, int training_size, int length)
+  std::vector<Eigen::MatrixXd> list = matricies_by_classification(training, training_size, length);
 
-  std::map<int,std::vector<std::map<int,int>>> dict;
+  std::map<int,std::vector<std::map<int,double>>> dict;
 
   int current_class = 0;
 
-  for(auto v : list)
+  for(auto class_matrix : list)
   {
-  	std::vector<std::map<int,int>> entry; 
+  	
+	// each iteration corresponds to one classifications individual matrix
+
+  	std::vector<std::map<int,double>> entry; 
 	
-	// get all occurences of a category (assuming category is from 1-10 and skipping those that are not in this range)
-
-	for(int i = 0; i < v.cols()-1; i++)
+	for(int i = 1; i < class_matrix.cols(); i++)
 	{
+
+		std::map<int,double> col_labels;
+
+		Eigen::VectorXd feature_column = class_matrix.col(i);
+
+		int max_label = get_max_feature_label(feature_column);
+		std::vector<int> label_counts;
+
+		for(int j = 0; j <= max_label; j++)
+		{
+			label_counts.push_back(0);
+		}
 		
 
-		Eigen::VectorXd col = train.col(i);
+		//printf("here 1\n");
 		
-		// sort col
+		int feature_column_length = len(feature_column);
 
-		// 
+		for(int j = 0; j < feature_column_length; j++)
+		{
+			int label = feature_column[j];
+			label_counts[label] += 1;
+		}
+
+		//printf("here 2\n");
+
+		for(int j = 0; j < max_label; j++)
+		{
+			col_labels[j] = label_counts[j];
+			
+			//entry[i-1][j] = label_counts[j] / feature_column_length; // i-1 because col(0) is the classification column	
+		}
+
+
+		//printf("here 3\n");
+		entry.push_back(col_labels);
 	}
 
-	
-
-
-  	map[current_class++] = entry;
+	//printf("finished entry\n");
+  	dict[current_class++] = entry;
   }
 
-  // calculate classification probabilities for each feature e.g. compute p_j(x|y)
+	//printf("finished dict\n");
+
+  // not we can lookup: dict[y][x_n][feature] = p_j(x|y)
+
+  // now compute the probability of each input vector belonging to a classification 
+
+  for(int i = 0; i < validation_size; i++)
+  {
+  	Eigen::VectorXd row = validation.row(i);
+
+	std::vector<double> probabilities;
+	
+	for(int j = 0; j < c; j++)
+	{
+		double p_y = unique_classifications_probabilities[j];
+
+		//printf("computed p_y\n");
+
+		double p_yx = p_y;
+
+		for(int k = 1; k < len(row); k++)
+		{
+			int label = row[k];
+			
+			double p_xy = dict[j][k-1][label];
+			p_yx *= p_xy; 
+		}
+		//printf("got probability\n");
+		probabilities.push_back(p_yx);
+	}
+
+	// do we need to normalize?
+ 	 // assign classification using argmax probability 
+  
+	int pred = get_argmax(probabilities);
+	predictions.push_back(pred);
+
+  }
+
+
+  
 
   return predictions;
 }
