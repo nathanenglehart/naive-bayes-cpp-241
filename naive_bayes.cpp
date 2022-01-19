@@ -161,6 +161,8 @@ std::vector<Eigen::MatrixXd> matricies_by_classification(Eigen::MatrixXd dataset
   return ret;
 }
 
+int num_classifications = 0;
+
 std::map<int, std::vector<std::vector<double>>> summarize_by_classification(Eigen::MatrixXd dataset, int size, int length)
 {
 
@@ -266,6 +268,88 @@ std::vector<int> gaussian_naive_bayes_classifier(Eigen::MatrixXd validation, int
     int output = predict(summaries, validation.row(i), training_size, verbose);
     predictions.push_back(output);
   }
+
+  return predictions;
+}
+
+std::vector<int> mle_naive_bayes_classifier(Eigen::MatrixXd validation, int validation_size, Eigen::MatrixXd training, int training_size, int length, bool verbose)
+{
+
+  /* Calculates the classification probabilities for each row in dataset and puts their predicted classification in a list. */
+
+
+  std::vector<int> predictions;
+
+  // calculate class frequencies, then
+  // calculate overall classification probabilities i.e. compute q_j(y)
+
+  std::map<int, std::vector<std::vector<double>>> summaries = summarize_by_classification(training, training_size, length);
+
+  std::vector<int> unique_classifications;
+  std::vector<int> unique_classifications_count; 
+  std::vector<float> unique_classifications_probabilities;
+  
+  int c = 0;
+  
+  for(auto v : summaries)
+  {
+  	unique_classifications.push_back(c++);
+  }
+  
+  c--;
+
+  int class_count = 0;
+  int total_count = 0;
+
+  for(int i = 0; i < c; i++)
+  {
+  	for(auto v : summaries[i])
+	{
+		class_count++;
+	}
+
+	unique_classifications_count.push_back(class_count);
+	total_count += class_count;
+	class_count = 0;
+  }		
+
+  for(auto v : unique_classifications_count)
+  {
+  	unique_classifications_probabilities.push_back(v / total_count);
+  }
+
+  // record the features of each vector corresponding to classification
+
+  std::vector<Eigen::MatrixXd> list = matricies_by_classification(Eigen::MatrixXd training, int training_size, int length)
+
+  std::map<int,std::vector<std::map<int,int>>> dict;
+
+  int current_class = 0;
+
+  for(auto v : list)
+  {
+  	std::vector<std::map<int,int>> entry; 
+	
+	// get all occurences of a category (assuming category is from 1-10 and skipping those that are not in this range)
+
+	for(int i = 0; i < v.cols()-1; i++)
+	{
+		
+
+		Eigen::VectorXd col = train.col(i);
+		
+		// sort col
+
+		// 
+	}
+
+	
+
+
+  	map[current_class++] = entry;
+  }
+
+  // calculate classification probabilities for each feature e.g. compute p_j(x|y)
 
   return predictions;
 }
