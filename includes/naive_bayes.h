@@ -22,6 +22,6 @@ std::vector<Eigen::MatrixXd> matricies_by_classification(Eigen::MatrixXd, int, i
 std::map<int, std::vector<std::vector<double>>> summarize_by_classification(Eigen::MatrixXd, int, int);
 std::map<int, double> calculate_classification_probabilities(std::map<int, std::vector<std::vector<double>>>, Eigen::VectorXd, int, bool);
 int predict(std::map<int, std::vector<std::vector<double>>>, Eigen::VectorXd, int, bool);
-std::vector<int> naive_bayes_classifier(Eigen::MatrixXd, int, Eigen::MatrixXd, int, int, bool);
+std::vector<int> gaussian_naive_bayes_classifier(Eigen::MatrixXd, int, Eigen::MatrixXd, int, int, bool);
 
 #endif

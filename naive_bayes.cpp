@@ -253,7 +253,7 @@ int predict(std::map<int, std::vector<std::vector<double>>> summaries, Eigen::Ve
   return best_label;
 }
 
-std::vector<int> naive_bayes_classifier(Eigen::MatrixXd validation, int validation_size, Eigen::MatrixXd training, int training_size, int length, bool verbose)
+std::vector<int> gaussian_naive_bayes_classifier(Eigen::MatrixXd validation, int validation_size, Eigen::MatrixXd training, int training_size, int length, bool verbose)
 {
 
   /* Calculates the classification probabilities for each row in dataset and puts their predicted classification in a list. */

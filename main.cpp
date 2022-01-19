@@ -33,7 +33,7 @@ template<typename T> T load_csv(const std::string & sys_path)
   return Eigen::Map<const Eigen::Matrix<typename T::Scalar, T::RowsAtCompileTime, T::ColsAtCompileTime, Eigen::RowMajor>>(values.data(), rows, values.size()/rows);
 }
 
-void driver(std::string sys_path_test, std::string sys_path_train, bool verbose)
+void driver(std::string sys_path_test, std::string sys_path_train, bool verbose, bool gaussian, bool mle)
 {
 
   /* Driver for a naive bayes classifier example. */
@@ -54,10 +54,11 @@ void driver(std::string sys_path_test, std::string sys_path_train, bool verbose)
       std::cout << train << "\n\n";
   }
 
-  std::vector<int> predictions = naive_bayes_classifier(test, test.rows(), train, train.rows(), train.cols(),verbose);
+  if(gaussian == true)
+  {
+  	std::vector<int> predictions = gaussian_naive_bayes_classifier(test, test.rows(), train, train.rows(), train.cols(),verbose);
   //std::vector<int> predictions = naive_bayes_classifier(test, test.rows(), train, train.rows(), train.cols());
-
-  if(verbose == true)
+  	  if(verbose == true)
   {
     int count = 0;
     for(auto v : predictions)
@@ -67,6 +68,13 @@ void driver(std::string sys_path_test, std::string sys_path_train, bool verbose)
     }
     std::cout << "\n";
   }
+
+  } else if(mle == true)
+  {
+	
+  }
+
+
 }
 
 int main(int argc, char ** argv)
@@ -74,6 +82,8 @@ int main(int argc, char ** argv)
   /* Verbose is set to false by default. */
 
   bool verbose = false;
+  bool gaussian = false;
+  bool mle = false;
 
   if(argc == 1)
   {
@@ -95,6 +105,8 @@ int main(int argc, char ** argv)
       std::cout << "Arguments:\n";
       std::cout << "   -h     Displays help menu\n";
       std::cout << "   -v     Displays output in verbose mode\n";
+      std::cout << "   -g     Gaussian Naive Bayes\n";
+      std::cout << "   -m     MLE Naive Bayes\n";
       return 0;
     } else if(counter == 1 && !(valid_filepath(argv[1])))
     {
@@ -118,6 +130,12 @@ int main(int argc, char ** argv)
       if(argv[counter][0] == '-' && argv[counter][1] == 'v' && argv[counter][2] == '\0')
       {
         verbose = true;
+      } else if(argv[counter][0] == '-' && argv[counter][1] == 'g' && argv[counter][2] == '\0')
+      {
+	gaussian = true;
+      } else if(argv[counter][0] == '-' && argv[counter][1] == 'm' && argv[counter][2] == '\0')
+      {
+      	mle = true;
       } else
       {
         std::cout << "Unknown option argument: " << argv[counter] << "\n";
@@ -136,10 +154,13 @@ int main(int argc, char ** argv)
     counter = counter + 1;
   }
 
-
-
-  driver(argv[2],argv[1],verbose);
-
+  if(gaussian || mle)
+  {
+      driver(argv[2],argv[1],verbose,gaussian,mle);
+  } else
+  {
+  	printf("No classifier specificed. Please run with -g for gaussian or -m for mle.\n");
+  }
   /* [Iris-virginica] => 0 [Iris-versicolor] => 1 [Iris-setosa] => 2 */
 
   //driver("./data/iristest.csv","./data/iris.csv",true);
