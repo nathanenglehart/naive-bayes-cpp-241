@@ -8,7 +8,7 @@
 
 /* Nathan Englehart, Xuhang Cao, Samuel Topper, Ishaq Kothari (Autumn 2021) */
 
-float round(float number)
+float round_num(float number)
 {
 
   /* Rounds number to 4 decimal points. */

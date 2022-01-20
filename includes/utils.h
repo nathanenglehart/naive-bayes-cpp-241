@@ -11,7 +11,7 @@
 
 /* Nathan Englehart, Xuhang Cao, Samuel Topper, Ishaq Kothari (Autumn 2021) */
 
-float round(float);
+float round_num(float);
 bool valid_filepath(const std::string &);
 double double_vector_list_lookup(std::vector<std::vector<double>>, int, int);
 double get_eigen_index(Eigen::VectorXd, int);
