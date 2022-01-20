@@ -4,10 +4,37 @@
 #include <vector>
 #include <map>
 #include <fstream>
+#include <cmath>
 #include "includes/eigen3/Eigen/Dense"
 #include "includes/utils.h"
 
 /* Nathan Englehart, Xuhang Cao, Samuel Topper, Ishaq Kothari (Autumn 2021) */
+
+double magnitude(std::vector<double> vector)
+{
+	double sum = 0.0;
+	for(auto f : vector)
+	{
+		sum += (f * f);
+	}
+
+	return sqrt(sum);
+}
+
+std::vector<double> normalize(std::vector<double> vector)
+{
+	
+	std::vector<double> ret;
+	
+	double divisor = magnitude(vector);
+
+	for(auto f : vector)
+	{
+		ret.push_back(f / divisor);
+	}
+
+	return ret;
+}
 
 int verbose_vector_count = 0;
 
@@ -372,7 +399,7 @@ std::vector<int> mle_naive_bayes_classifier(Eigen::MatrixXd validation, int vali
 
   for(auto v : unique_classifications_count)
   {
-  	printf("v: %f, total_count: %f\n",v,total_count);
+  	//printf("v: %f, total_count: %f\n",v,total_count);
   	double unique_classification_probability = 0.0;
 	unique_classification_probability =  (double)v /(double)total_count;
   	unique_classifications_probabilities.push_back(unique_classification_probability);
@@ -383,7 +410,7 @@ std::vector<int> mle_naive_bayes_classifier(Eigen::MatrixXd validation, int vali
 
   for(auto v : unique_classifications_probabilities)
   {
-  	printf("class probability: %f\n",v);
+  	//printf("class probability: %f\n",v);
   }
 
 
@@ -410,11 +437,16 @@ std::vector<int> mle_naive_bayes_classifier(Eigen::MatrixXd validation, int vali
 		Eigen::VectorXd feature_column = class_matrix.col(i);
 
 		int max_label = get_max_feature_label(feature_column);
-		std::vector<int> label_counts;
+		//std::vector<int> label_counts;
+		int label_counts [max_label];
 
+		printf("max_label: %d\n",max_label);
+
+		int curr_len = 0;
 		for(int j = 0; j <= max_label; j++)
 		{
-			label_counts.push_back(0);
+			label_counts[j] = 0;
+			curr_len++;
 		}
 		
 
@@ -422,10 +454,23 @@ std::vector<int> mle_naive_bayes_classifier(Eigen::MatrixXd validation, int vali
 		
 		int feature_column_length = len(feature_column);
 
-		for(int j = 1; j < feature_column_length; j++)
+		for(int j = 0; j < feature_column_length; j++)
 		{
 			int label = feature_column[j];
+			printf("label: %d\n",label);
 			label_counts[label] += 1;
+			
+
+			/*
+			if(label >= curr_len)
+			{
+				printf("\n\nERROR: ");
+				printf("(size == %d and label == %d)\n\n",curr_len,label);
+			}else {
+				printf("(size == %d and label == %d)\n",curr_len,label);
+				label_counts[label] += 1;
+			}
+			*/
 		}
 
 		//printf("here 2\n");
@@ -439,7 +484,7 @@ std::vector<int> mle_naive_bayes_classifier(Eigen::MatrixXd validation, int vali
 
 
 		//printf("here 3\n");
-		
+		/*
 		printf("\ncol_labels for class %d, col %d\n",current_class,i);
 		
 		for (const auto& x : col_labels) {
@@ -447,14 +492,23 @@ std::vector<int> mle_naive_bayes_classifier(Eigen::MatrixXd validation, int vali
     		}
 
 		printf("\n");
-
+		*/
 		entry.push_back(col_labels);
 	}
 
 	//printf("finished entry\n");
   	dict[current_class++] = entry;
   }
+  
+  int mat_num = 0;
 
+/*
+  for(auto v : list)
+  {
+  	std::cout << mat_num << "\n";
+  	std::cout << v  << "\n";
+  }
+*/
 	//printf("finished dict\n");
 
   // not we can lookup: dict[y][x_n][feature] = p_j(x|y)
@@ -487,28 +541,12 @@ std::vector<int> mle_naive_bayes_classifier(Eigen::MatrixXd validation, int vali
 
 	}
 
-	//std::cout << "row:\n" << row << " ";
-
-	
-	for(auto v : row)
-	{
-//		std::cout << v << " ";
-	}
-//	printf("\n");
-	int class_num = 0;
-	for(auto v : probabilities)
-	{
-//		std::cout << class_num << ": " << v << "\n";
-		class_num++;
-	}
-//	printf("\n");
-	
+	std::vector<double> normalized_probabilities = normalize(probabilities); 
 
 
-	// do we need to normalize?
- 	 // assign classification using argmax probability 
+ 	 // assign classification using argmax probability
   
-	int pred = get_argmax(probabilities,class_num-1);
+	int pred = get_argmax(normalized_probabilities,c);
 	predictions.push_back(pred);
 
   }

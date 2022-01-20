@@ -91,8 +91,8 @@ void driver(std::string sys_path_test, std::string sys_path_train, bool verbose,
   	if(verbose)
   	{
   		int num_folds = 10;
-  		//double result = kfcv(test,num_folds,&mle_naive_bayes_classifier);
-		//printf("\nmodel performance on new data: %f\n",result);
+  		double result = kfcv(test,num_folds,&mle_naive_bayes_classifier);
+		printf("\nmodel performance on new data: %f\n",result);
   	}
   }
 }

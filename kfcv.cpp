@@ -127,6 +127,9 @@ double kfcv(Eigen::MatrixXd dataset, int K, std::vector<int> (*classifier) (Eige
 		{
 			truth_labels.push_back(validation.coeff(i,0));
 		}
+		
+		//std::cout << "validation rows: " << validation.rows() << "validation cols: " << validation.cols() << "\n" << validation << "\n";
+		//std::cout << "trin rows: " << train.rows() << "train cols: " << train.cols() << "\n" << train << "\n";
 
 
 
@@ -134,7 +137,11 @@ double kfcv(Eigen::MatrixXd dataset, int K, std::vector<int> (*classifier) (Eige
 
 		double error = misclassification_rate(predictions,truth_labels);
 		total_error += error;
+
+		printf("\nRUN: %d\n",run_counter++);
 	}
+
+	//print("validation")
 
 	return (double) total_error / K;
 }
