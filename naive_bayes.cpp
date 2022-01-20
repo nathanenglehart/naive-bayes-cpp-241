@@ -60,6 +60,8 @@ double gaussian_pdf(double x, double mean, double standard_deviation)
  return (1 / (sqrt(2 * M_PI) * standard_deviation)) * exponent;
 }
 
+int indicies_size = 0;
+
 std::vector<int> class_indicies(Eigen::MatrixXd X, int size)
 {
 
@@ -84,6 +86,8 @@ std::vector<int> class_indicies(Eigen::MatrixXd X, int size)
     }
     prev_classification = classification;
   }
+
+  indicies_size = size;
 
   return indicies;
 
@@ -122,17 +126,20 @@ std::vector<Eigen::MatrixXd> matricies_by_classification(Eigen::MatrixXd dataset
   std::vector<int> indicies = class_indicies(sorted_dataset,size);
   std::vector<Eigen::MatrixXd> ret;
 
-  int indicies_array [indicies.size()];
+  int indicies_array [indicies_size];
   int idx = 0;
-  for(auto v : indicies) { indicies_array[idx++] = v; }
+  for(auto v : indicies) { 
+  	indicies_array[idx++] = v; 
+  }
+  int indicies_array_size = idx - 1;
   idx = 1;
-
+  
   std::vector<Eigen::VectorXd> rows;
-
-  for(int i = 0; i < size; i++)
-  {
-
-    if(indicies_array[idx] == i)
+  bool check_final = false;
+  int i = 0;
+  while (i < size)
+  { 
+    if(check_final == false && i == indicies_array[idx]) // was i
     {
       Eigen::MatrixXd entry(rows.size(),length);
       int j = 0;
@@ -141,14 +148,24 @@ std::vector<Eigen::MatrixXd> matricies_by_classification(Eigen::MatrixXd dataset
         entry.row(j) = v;
         j++;
       }
+      if(idx != indicies_array_size)
+      {
       idx++;
+      } else
+      {
+        check_final = true;
+      }
       ret.push_back(entry);
       rows.clear();
     }
 
     Eigen::VectorXd row = sorted_dataset.row(i);
     rows.push_back(row);
+    i++;
+
   }
+
+
   Eigen::MatrixXd entry(rows.size(),length);
   int j = 0;
   for(auto v : rows)
@@ -324,7 +341,7 @@ std::vector<int> mle_naive_bayes_classifier(Eigen::MatrixXd validation, int vali
   // calculate class frequencies, then
   // calculate overall classification probabilities i.e. compute q_j(y)
 
-  std::map<int, std::vector<std::vector<double>>> summaries = summarize_by_classification(training, training_size, length);
+  std::map<int, std::vector<std::vector<double>>> summaries = summarize_by_classification(training, training.rows(), training.cols());
 
   std::vector<int> unique_classifications;
   std::vector<int> unique_classifications_count; 
@@ -359,8 +376,6 @@ std::vector<int> mle_naive_bayes_classifier(Eigen::MatrixXd validation, int vali
   	unique_classifications_probabilities.push_back(v / total_count);
   }
 
-
-
   // record the features of each vector corresponding to classification
 
   std::vector<Eigen::MatrixXd> list = matricies_by_classification(training, training_size, length);
@@ -392,7 +407,6 @@ std::vector<int> mle_naive_bayes_classifier(Eigen::MatrixXd validation, int vali
 		}
 		
 
-		//printf("here 1\n");
 		
 		int feature_column_length = len(feature_column);
 
@@ -402,35 +416,29 @@ std::vector<int> mle_naive_bayes_classifier(Eigen::MatrixXd validation, int vali
 			label_counts[label] += 1;
 		}
 
-		//printf("here 2\n");
 
 		for(int j = 1; j < max_label+1; j++)
 		{
 			col_labels[j] = (long double) label_counts[j] / feature_column_length;
-			
-			//entry[i-1][j] = label_counts[j] / feature_column_length; // i-1 because col(0) is the classification column	
 		}
 
 
-		//printf("here 3\n");
 		
-		printf("\ncol_labels for class %d, col %d\n",current_class,i);
+		//printf("\ncol_labels for class %d, col %d\n",current_class,i);
 		//std::cout << col_labels;	
 		
-		for (const auto& x : col_labels) {
-        		std::cout << x.first << ": " << x.second << "\n";
-    		}
+		//for (const auto& x : col_labels) {
+        	//	std::cout << x.first << ": " << x.second << "\n";
+    		//}
 
-		printf("\n");
+		//printf("\n");
 
 		entry.push_back(col_labels);
 	}
 
-	//printf("finished entry\n");
   	dict[current_class++] = entry;
   }
 
-	//printf("finished dict\n");
 
   // not we can lookup: dict[y][x_n][feature] = p_j(x|y)
 
@@ -468,6 +476,7 @@ std::vector<int> mle_naive_bayes_classifier(Eigen::MatrixXd validation, int vali
 	//	std::cout << v << " ";
 	//}
 	//printf("\n");
+
 	int class_num = 0;
 	for(auto v : probabilities)
 	{

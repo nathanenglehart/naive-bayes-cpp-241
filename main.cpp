@@ -7,6 +7,7 @@
 #include "includes/eigen3/Eigen/Dense"
 #include "includes/utils.h"
 #include "includes/naive_bayes.h"
+#include "includes/kfcv.h"
 
 /* Nathan Englehart, Xuhang Cao, Samuel Topper, Ishaq Kothari (Autumn 2021) */
 
@@ -14,7 +15,7 @@
 template<typename T> T load_csv(const std::string & sys_path)
 {
 
-  /* Returns csv file input as an Eigen matrix or vector. */
+  /* Returns csv file input as an Eigen matrix or vector. Based on post from https://tinyurl.com/3z5s2zxn */
 
   std::ifstream in;
   in.open(sys_path);
@@ -57,35 +58,41 @@ void driver(std::string sys_path_test, std::string sys_path_train, bool verbose,
   if(gaussian == true)
   {
   	std::vector<int> predictions = gaussian_naive_bayes_classifier(test, test.rows(), train, train.rows(), train.cols(),verbose);
-  //std::vector<int> predictions = naive_bayes_classifier(test, test.rows(), train, train.rows(), train.cols());
-  	  if(verbose == true)
-  {
-    int count = 0;
-    for(auto v : predictions)
-    {
-        std::cout << "Row " << count << ": Class = " << v << "\n";
-        count++;
-    }
-    std::cout << "\n";
-  }
+  	
+    	int count = 0;
+    	for(auto v : predictions)
+    	{
+        	std::cout << "Row " << count << ": Class = " << v << "\n";
+        	count++;
+    	}
+    	std::cout << "\n";
+  	
+
+  	if(verbose)
+  	{
+  		int num_folds = 10;
+  		double result = kfcv(test,num_folds,&gaussian_naive_bayes_classifier);
+		printf("\nmodel performance on new data: %f\n",result);
+  	}
 
   } else if(mle == true)
   {
 	std::vector<int> predictions = mle_naive_bayes_classifier(test, test.rows(), train, train.rows(), train.cols(),verbose);
-	  	  if(verbose == true)
-  {
-    int count = 0;
-    for(auto v : predictions)
-    {
-        std::cout << "Row " << count << ": Class = " << v << "\n"; // add back after debugging
-        count++;
-    }
-    std::cout << "\n";
+	int count = 0;
+    	for(auto v : predictions)
+    	{
+        	std::cout << "Row " << count << ": Class = " << v << "\n"; // add back after debugging
+        	count++;
+    	}
+    	std::cout << "\n";
+
+  	if(verbose)
+  	{
+  		int num_folds = 10;
+  		double result = kfcv(test,num_folds,&mle_naive_bayes_classifier);
+		printf("\nmodel performance on new data: %f\n",result);
+  	}
   }
-
-  }
-
-
 }
 
 int main(int argc, char ** argv)
@@ -172,6 +179,7 @@ int main(int argc, char ** argv)
   {
   	printf("No classifier specificed. Please run with -g for gaussian or -m for mle.\n");
   }
+
   /* [Iris-virginica] => 0 [Iris-versicolor] => 1 [Iris-setosa] => 2 */
 
   //driver("./data/iristest.csv","./data/iris.csv",true);
