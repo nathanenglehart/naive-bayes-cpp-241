@@ -79,7 +79,7 @@ std::vector<Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>, Eigen::aligned_
 
 int run_counter = 1;
 
-double kfcv(Eigen::MatrixXd dataset, int K, std::vector<int> (*classifier) (Eigen::MatrixXd validation, int validation_size, Eigen::MatrixXd training, int training_size, int length, bool verbose))
+double kfcv(Eigen::MatrixXd dataset, int K, std::vector<int> (*classifier) (Eigen::MatrixXd validation, int validation_size, Eigen::MatrixXd training, int training_size, int length, bool verbose),bool verbose)
 {
 	/* Returns std::vector of error statistics from run of cross validation using given error function and classification function. */
 
@@ -138,10 +138,20 @@ double kfcv(Eigen::MatrixXd dataset, int K, std::vector<int> (*classifier) (Eige
 		double error = misclassification_rate(predictions,truth_labels);
 		total_error += error;
 
-		printf("\nRUN: %d\n",run_counter++);
+		if(verbose)
+		{
+			if(i!=0)
+			{
+				printf("%d fold cross validation, fold %d error -> %f\n",K,run_counter++,(double) total_error/i);
+			}else
+			{
+				printf("%d fold cross validation, fold %d error -> %f\n",K,run_counter++,(double) total_error);
+			}
+		}
+
 	}
 
 	//print("validation")
 
-	return (double) total_error / K;
+	return (double) total_error / (double) K;
 }

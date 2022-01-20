@@ -440,7 +440,7 @@ std::vector<int> mle_naive_bayes_classifier(Eigen::MatrixXd validation, int vali
 		//std::vector<int> label_counts;
 		int label_counts [max_label];
 
-		printf("max_label: %d\n",max_label);
+		//printf("max_label: %d\n",max_label);
 
 		int curr_len = 0;
 		for(int j = 0; j <= max_label; j++)
@@ -457,7 +457,7 @@ std::vector<int> mle_naive_bayes_classifier(Eigen::MatrixXd validation, int vali
 		for(int j = 0; j < feature_column_length; j++)
 		{
 			int label = feature_column[j];
-			printf("label: %d\n",label);
+			//printf("label: %d\n",label);
 			label_counts[label] += 1;
 			
 
