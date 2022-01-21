@@ -59,6 +59,8 @@ This is currently a work in progress. We are currently including the eigen3 line
 ## References
 David Barber, [Bayesian Reasoning and Machine Learning](http://web4.cs.ucl.ac.uk/staff/D.Barber/textbook/171216.pdf), 2016. (pp. 237-245)<br>
 
+Dua, D. and Graff, C. (2019). UCI Machine Learning Repository [http://archive.ics.uci.edu/ml](http://archive.ics.uci.edu/ml). Irvine, CA: University of California, School of Information and Computer Science.
+
 Max Kuhn and Kjell Johnson, Applied Predictive Modeling, 2013. (pp. 353)<br>
 
 Data Mining: Practical Machine Learning Tools and Techniques by Ian Whitten, 2016. (pp. 88)
