@@ -12,6 +12,8 @@
 
 double magnitude(std::vector<double> vector)
 {
+	/* Returns magnitude of given vector. */
+	
 	double sum = 0.0;
 	for(auto f : vector)
 	{
@@ -23,6 +25,7 @@ double magnitude(std::vector<double> vector)
 
 std::vector<double> normalize(std::vector<double> vector)
 {
+	/* Returns normalized version of given vector. */
 	
 	std::vector<double> ret;
 	
@@ -166,7 +169,7 @@ std::vector<Eigen::MatrixXd> matricies_by_classification(Eigen::MatrixXd dataset
   int i = 0;
   while (i < size)
   { 
-    if(check_final == false && i == indicies_array[idx]) // was i
+    if(check_final == false && i == indicies_array[idx]) 
     {
       Eigen::MatrixXd entry(rows.size(),length);
       int j = 0;
@@ -189,7 +192,6 @@ std::vector<Eigen::MatrixXd> matricies_by_classification(Eigen::MatrixXd dataset
     Eigen::VectorXd row = sorted_dataset.row(i);
     rows.push_back(row);
     i++;
-
   }
 
 
@@ -229,7 +231,7 @@ std::map<int, std::vector<std::vector<double>>> summarize_by_classification(Eige
 std::map<int, double> calculate_classification_probabilities(std::map<int, std::vector<std::vector<double>>> summaries, Eigen::VectorXd row, int size, bool verbose)
 {
 
-  /* Calculates the classification probabilities for a single vector using P(A|B) = P(B|A) * P(A), which is derived from Bayes Theorem, for each classification. */
+  /* Calculates the classification probabilities for a single vector with P(class = y | x_1, ..., x_2) = P(x_1 | class = y) * ... * P(x_n | class = y) * P(class = y) */
 
   std::map<int, double> probabilities;
   std::map<int, std::vector<std::vector<double>>>::iterator it;
@@ -250,14 +252,14 @@ std::map<int, double> calculate_classification_probabilities(std::map<int, std::
   {
 
     std::vector<std::vector<double>> entry = it->second;
-    probabilities[classification_value] = double_vector_list_lookup(entry,0,2) / (size); // P(A)
+    probabilities[classification_value] = double_vector_list_lookup(entry,0,2) / (size); // P(class = y)
 
-    for(int i = 1; i < row.size(); i++)
+    for(int i = 1; i < row.size(); i++) // P(class = y | x_1, ..., x_n)
     {
       double mean = double_vector_list_lookup(entry,i,0);
       double standard_deviation = double_vector_list_lookup(entry,i,1);
       double x = get_eigen_index(row,i);
-      probabilities[classification_value] *= gaussian_pdf(x,mean,standard_deviation); // P(B|A)
+      probabilities[classification_value] *= gaussian_pdf(x,mean,standard_deviation); 
     }
 
     if(verbose == true)
@@ -387,11 +389,6 @@ std::vector<int> mle_naive_bayes_classifier(Eigen::MatrixXd validation, int vali
 
   for(int i = 0; i < c; i++)
   {
-  	//for(int j = 0; j < class_matricies_list[i].rows(); j++)
-	//{
-//		class_count++;
-//	}
-
 	double class_count = (double) class_matricies_list[i].rows();
 	unique_classifications_count.push_back(class_count);
 	total_count += class_count;
@@ -399,20 +396,10 @@ std::vector<int> mle_naive_bayes_classifier(Eigen::MatrixXd validation, int vali
 
   for(auto v : unique_classifications_count)
   {
-  	//printf("v: %f, total_count: %f\n",v,total_count);
   	double unique_classification_probability = 0.0;
 	unique_classification_probability =  (double)v /(double)total_count;
   	unique_classifications_probabilities.push_back(unique_classification_probability);
-	//printf("UNIQUE CLASSIFICATION -> %d\n",unique_classification_probability);
   }
-
-  // debugging
-
-  for(auto v : unique_classifications_probabilities)
-  {
-  	//printf("class probability: %f\n",v);
-  }
-
 
   // record the features of each vector corresponding to classification
 
@@ -437,10 +424,7 @@ std::vector<int> mle_naive_bayes_classifier(Eigen::MatrixXd validation, int vali
 		Eigen::VectorXd feature_column = class_matrix.col(i);
 
 		int max_label = get_max_feature_label(feature_column);
-		//std::vector<int> label_counts;
 		int label_counts [max_label];
-
-		//printf("max_label: %d\n",max_label);
 
 		int curr_len = 0;
 		for(int j = 0; j <= max_label; j++)
@@ -448,71 +432,30 @@ std::vector<int> mle_naive_bayes_classifier(Eigen::MatrixXd validation, int vali
 			label_counts[j] = 0;
 			curr_len++;
 		}
-		
-
-		//printf("here 1\n");
-		
+				
 		int feature_column_length = len(feature_column);
 
 		for(int j = 0; j < feature_column_length; j++)
 		{
 			int label = feature_column[j];
-			//printf("label: %d\n",label);
 			label_counts[label] += 1;
-			
-
-			/*
-			if(label >= curr_len)
-			{
-				printf("\n\nERROR: ");
-				printf("(size == %d and label == %d)\n\n",curr_len,label);
-			}else {
-				printf("(size == %d and label == %d)\n",curr_len,label);
-				label_counts[label] += 1;
-			}
-			*/
 		}
 
-		//printf("here 2\n");
 
 		for(int j = 1; j < max_label+1; j++)
 		{
 			col_labels[j] = (double) label_counts[j] / feature_column_length;
-			
-			//entry[i-1][j] = label_counts[j] / feature_column_length; // i-1 because col(0) is the classification column	
 		}
 
-
-		//printf("here 3\n");
-		/*
-		printf("\ncol_labels for class %d, col %d\n",current_class,i);
-		
-		for (const auto& x : col_labels) {
-        		std::cout << x.first << ": " << x.second << "\n";
-    		}
-
-		printf("\n");
-		*/
 		entry.push_back(col_labels);
 	}
 
-	//printf("finished entry\n");
   	dict[current_class++] = entry;
   }
   
   int mat_num = 0;
 
-/*
-  for(auto v : list)
-  {
-  	std::cout << mat_num << "\n";
-  	std::cout << v  << "\n";
-  }
-*/
-	//printf("finished dict\n");
-
-  // not we can lookup: dict[y][x_n][feature] = p_j(x|y)
-
+  // now we can lookup: dict[y][x_n][feature] = p_j(x|y)
   // now compute the probability of each input vector belonging to a classification 
 
   for(int i = 0; i < validation_size; i++)
@@ -524,9 +467,7 @@ std::vector<int> mle_naive_bayes_classifier(Eigen::MatrixXd validation, int vali
 	for(int j = 0; j < c; j++)
 	{
 		double p_y = unique_classifications_probabilities[j];
-
-		//printf("computed p_y\n");
-
+		
 		double p_yx = p_y;
 
 		for(int k = 1; k < len(row); k++)
@@ -536,13 +477,11 @@ std::vector<int> mle_naive_bayes_classifier(Eigen::MatrixXd validation, int vali
 			double p_xy = dict[j][k-1][label];
 			p_yx *= p_xy; 
 		}
-		//printf("got probability\n");
+		
 		probabilities.push_back(p_yx);
-
 	}
 
 	std::vector<double> normalized_probabilities = normalize(probabilities); 
-
 
  	 // assign classification using argmax probability
   
@@ -550,9 +489,6 @@ std::vector<int> mle_naive_bayes_classifier(Eigen::MatrixXd validation, int vali
 	predictions.push_back(pred);
 
   }
-
-
-  
 
   return predictions;
 }
