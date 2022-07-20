@@ -6,7 +6,7 @@ Nathan Englehart, Xuhang Cao, Samuel Topper, Ishaq Kothari (Autumn 2021)
 To clone and run this classifier so that it can be run on a dataset, please run the following. 
 
 ```
-git clone git@github.com:nathanenglehart/naive-bayes-cpp-241.git
+git clone https://github.com/nathanenglehart/naive-bayes-cpp-241
 cd naive-bayes-cpp-241
 make
 ```
@@ -33,7 +33,7 @@ To run this program in verbose mode, please run:
 To install this program to your posix standard system, please run the following.
 
 ```
-git clone git@github.com:nathanenglehart/naive-bayes-cpp-241.git
+git clone https://github.com/nathanenglehart/naive-bayes-cpp-241
 cd naive-bayes-cpp-241
 make
 sudo cp naive-bayes-cli /usr/local/bin/naive-bayes-cli
