@@ -23,6 +23,21 @@ For a help menu, please run:
 ./naive-bayes-cli -h
 ```
 
+which displays:
+
+```
+Naive Bayes Cli (2021 Dec 9, compiled Wed Jul 20 15:05:41 2022 15:06:06)
+
+usage: ./naive-bayes-cli [train] [test] [options ..]    read in train csv and test csv files from filesystem
+   or: ./naive-bayes-cli -h                             displays help menu
+
+Arguments:
+   -h     Displays help menu
+   -v     Displays output in verbose mode
+   -g     Gaussian Naive Bayes
+   -m     MLE Naive Bayes
+```
+
 To run this program in verbose mode, please run:
 
 ```bash
