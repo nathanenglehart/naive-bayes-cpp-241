@@ -15,7 +15,7 @@
 template<typename T> T load_csv(const std::string & sys_path)
 {
 
-  /* Returns csv file input as an Eigen matrix or vector. Based on post from https://tinyurl.com/3z5s2zxn */
+  /* Returns csv file input as an Eigen matrix or vector. */
 
   std::ifstream in;
   in.open(sys_path);
@@ -64,8 +64,14 @@ void driver(std::string sys_path_test, std::string sys_path_train, bool verbose,
     	int count = 0;
     	for(auto v : predictions)
     	{
-        	std::cout << "Row " << count << ": Class = " << v << "\n";
-        	count++;
+        	if(verbose == true)
+		{
+			std::cout << "Row " << count << ": Class = " << v << "\n";
+		} else
+		{
+			std::cout << v << "\n";
+		}
+		count++;
     	}
     	std::cout << "\n";
   	
@@ -99,8 +105,7 @@ void driver(std::string sys_path_test, std::string sys_path_train, bool verbose,
 
 int main(int argc, char ** argv)
 {
-  /* Verbose is set to false by default. */
-
+	
   bool verbose = false;
   bool gaussian = false;
   bool mle = false;
@@ -140,10 +145,10 @@ int main(int argc, char ** argv)
       return 1;
     } else if(counter == 1 && (valid_filepath(argv[1])))
     {
-      //std::cout << "Train filepath: " << argv[1] << "\n";
+
     } else if(counter == 2 && (valid_filepath(argv[2])))
     {
-      //std::cout << "Test filepath: " << argv[2] << "\n";
+
     } else if(counter >= 3)
     {
 
@@ -181,13 +186,6 @@ int main(int argc, char ** argv)
   {
   	printf("No classifier specificed. Please run with -g for gaussian or -m for mle.\n");
   }
-
-  /* [Iris-virginica] => 0 [Iris-versicolor] => 1 [Iris-setosa] => 2 */
-
-  //driver("./data/iristest.csv","./data/iris.csv",true);
-
-  //driver("./data/S1test.csv","./data/S1train.csv",true);
-  //driver("./data/S2test.csv","./data/S2train.csv",true);
 
   return 0;
 }
