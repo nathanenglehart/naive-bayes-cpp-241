@@ -444,7 +444,7 @@ std::vector<int> mle_naive_bayes_classifier(Eigen::MatrixXd validation, int vali
 
 		for(int j = 1; j < max_label+1; j++)
 		{
-			col_labels[j] = (double) label_counts[j] / feature_column_length;
+			col_labels[j] = (double) (label_counts[j] + 1) / feature_column_length; // + 1 in numerator for laplace smoothing
 		}
 
 		entry.push_back(col_labels);
