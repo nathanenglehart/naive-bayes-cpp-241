@@ -85,7 +85,7 @@ void driver(std::string sys_path_test, std::string sys_path_train, bool verbose,
 
   } else if(categorical == true)
   {
-	std::vector<int> predictions = categorical_naive_bayes_classifier(test, test.rows(), train, train.rows(), train.cols(),verbose);
+	std::vector<int> predictions = categorical_naive_bayes_classifier(test, test.rows(), train, train.rows(), train.cols(), verbose);
 	int count = 0;
     	for(auto v : predictions)
     	{

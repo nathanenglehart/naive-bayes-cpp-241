@@ -361,11 +361,12 @@ std::vector<int> categorical_naive_bayes_classifier(Eigen::MatrixXd validation, 
 
   /* Calculates the classification probabilities for each row in dataset and puts their predicted classification in a list. */
 
+  double alpha = 1.0; // for laplace smoothing
+
   if(verbose)
   {
   	printf("mode 2: categorical\n");
   }
-
 
   std::vector<int> predictions;
 
@@ -441,10 +442,11 @@ std::vector<int> categorical_naive_bayes_classifier(Eigen::MatrixXd validation, 
 			label_counts[label] += 1;
 		}
 
-
 		for(int j = 1; j < max_label+1; j++)
 		{
-			col_labels[j] = (double) (label_counts[j] + 1) / feature_column_length; // + 1 in numerator for laplace smoothing
+			// computes p_j(x|y) using laplace smoothing
+
+			col_labels[j] = (double) ((label_counts[j] + alpha) / (feature_column_length + alpha * class_matrix.rows())); 
 		}
 
 		entry.push_back(col_labels);
