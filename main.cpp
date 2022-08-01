@@ -36,7 +36,7 @@ template<typename T> T load_csv(const std::string & sys_path)
   /* based on code from https://stackoverflow.com/questions/34247057/how-to-read-csv-file-and-assign-to-eigen-matrix/39146048 */
 }
 
-void driver(std::string sys_path_test, std::string sys_path_train, bool verbose, bool gaussian, bool mle)
+void driver(std::string sys_path_test, std::string sys_path_train, bool verbose, bool gaussian, bool categorical)
 {
 
   /* Driver for a naive bayes classifier example. */
@@ -83,9 +83,9 @@ void driver(std::string sys_path_test, std::string sys_path_train, bool verbose,
 		printf("\nmodel performance on new data: %f\n",result);
   	}
 
-  } else if(mle == true)
+  } else if(categorical == true)
   {
-	std::vector<int> predictions = mle_naive_bayes_classifier(test, test.rows(), train, train.rows(), train.cols(),verbose);
+	std::vector<int> predictions = categorical_naive_bayes_classifier(test, test.rows(), train, train.rows(), train.cols(),verbose);
 	int count = 0;
     	for(auto v : predictions)
     	{
@@ -97,7 +97,7 @@ void driver(std::string sys_path_test, std::string sys_path_train, bool verbose,
   	if(verbose)
   	{
   		int num_folds = 10;
-  		double result = kfcv(test,num_folds,&mle_naive_bayes_classifier,verbose);
+  		double result = kfcv(test,num_folds,&categorical_naive_bayes_classifier,verbose);
 		printf("\nmodel performance on new data: %f\n",result);
   	}
   }
@@ -108,7 +108,7 @@ int main(int argc, char ** argv)
 	
   bool verbose = false;
   bool gaussian = false;
-  bool mle = false;
+  bool categorical = false;
 
   if(argc == 1)
   {
@@ -131,7 +131,7 @@ int main(int argc, char ** argv)
       std::cout << "   -h     Displays help menu\n";
       std::cout << "   -v     Displays output in verbose mode\n";
       std::cout << "   -g     Gaussian Naive Bayes\n";
-      std::cout << "   -m     MLE Naive Bayes\n";
+      std::cout << "   -c     Categorical Naive Bayes\n";
       return 0;
     } else if(counter == 1 && !(valid_filepath(argv[1])))
     {
@@ -158,9 +158,9 @@ int main(int argc, char ** argv)
       } else if(argv[counter][0] == '-' && argv[counter][1] == 'g' && argv[counter][2] == '\0')
       {
 	gaussian = true;
-      } else if(argv[counter][0] == '-' && argv[counter][1] == 'm' && argv[counter][2] == '\0')
+      } else if(argv[counter][0] == '-' && argv[counter][1] == 'c' && argv[counter][2] == '\0')
       {
-      	mle = true;
+      	categorical = true;
       } else
       {
         std::cout << "Unknown option argument: " << argv[counter] << "\n";
@@ -179,12 +179,12 @@ int main(int argc, char ** argv)
     counter = counter + 1;
   }
 
-  if(gaussian || mle)
+  if(gaussian || categorical)
   {
-      driver(argv[2],argv[1],verbose,gaussian,mle);
+      driver(argv[2],argv[1],verbose,gaussian,categorical);
   } else
   {
-  	printf("No classifier specificed. Please run with -g for gaussian or -m for mle.\n");
+  	printf("No classifier specificed. Please run with -g for gaussian or -c for categorical.\n");
   }
 
   return 0;

@@ -23,6 +23,6 @@ std::map<int, std::vector<std::vector<double>>> summarize_by_classification(Eige
 std::map<int, double> calculate_classification_probabilities(std::map<int, std::vector<std::vector<double>>>, Eigen::VectorXd, int, bool);
 int predict(std::map<int, std::vector<std::vector<double>>>, Eigen::VectorXd, int, bool);
 std::vector<int> gaussian_naive_bayes_classifier(Eigen::MatrixXd, int, Eigen::MatrixXd, int, int, bool);
-std::vector<int> mle_naive_bayes_classifier(Eigen::MatrixXd, int, Eigen::MatrixXd, int, int, bool);
+std::vector<int> categorical_naive_bayes_classifier(Eigen::MatrixXd, int, Eigen::MatrixXd, int, int, bool);
 
 #endif

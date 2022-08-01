@@ -356,14 +356,14 @@ std::vector<int> gaussian_naive_bayes_classifier(Eigen::MatrixXd validation, int
 }
 
 
-std::vector<int> mle_naive_bayes_classifier(Eigen::MatrixXd validation, int validation_size, Eigen::MatrixXd training, int training_size, int length, bool verbose)
+std::vector<int> categorical_naive_bayes_classifier(Eigen::MatrixXd validation, int validation_size, Eigen::MatrixXd training, int training_size, int length, bool verbose)
 {
 
   /* Calculates the classification probabilities for each row in dataset and puts their predicted classification in a list. */
 
   if(verbose)
   {
-  	printf("mode 2: mle\n");
+  	printf("mode 2: categorical\n");
   }
 
 
