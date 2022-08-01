@@ -35,7 +35,7 @@ Arguments:
    -h     Displays help menu
    -v     Displays output in verbose mode
    -g     Gaussian Naive Bayes
-   -m     MLE Naive Bayes
+   -c     Categorical Naive Bayes
 ```
 
 To run this program in verbose mode, please run:
