@@ -70,7 +70,7 @@ sudo rm /usr/local/bin/naive-bayes-cli
 
 ## Documentation
 
-Detailed documentation can be found at [https://nathanenglehart.github.io/naive-bayes](https://nathanenglehart.github.io/naive-bayes). 
+More detailed documentation can be found at [https://nathanenglehart.github.io/naive-bayes](https://nathanenglehart.github.io/naive-bayes). 
 
 ## Notes
 
@@ -83,3 +83,5 @@ Barber, David. (2016). Bayesian Reasoning and Machine Learning. Cambridge Univer
 Fisher, R.A. (1988). UCI Machine Learning Repository [https://archive.ics.uci.edu/ml/datasets/iris](https://archive.ics.uci.edu/ml/datasets/iris). Irvine, CA: University of California, School of Information and Computer Science.
  
 Kuhn, Max and Johnson, Kjell. (2013). Applied Predictive Modeling, 2013. Springer.
+
+Wolberg, William et al. (1995). UCI Machine Learning Repository [https://archive.ics.uci.edu/ml/datasets/breast+cancer+wisconsin+(diagnostic)](https://archive.ics.uci.edu/ml/datasets/breast+cancer+wisconsin+(diagnostic)). Irvine, CA: University of California, School of Information and Computer Science.
