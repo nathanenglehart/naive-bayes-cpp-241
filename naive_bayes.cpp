@@ -231,8 +231,8 @@ std::map<int, std::vector<std::vector<double>>> summarize_by_classification(Eige
 std::map<int, double> calculate_classification_probabilities(std::map<int, std::vector<std::vector<double>>> summaries, Eigen::VectorXd row, int size, bool verbose)
 {
 
-  /* Calculates the classification probabilities for a single vector with P(class = y | x_1, ..., x_2) = P(x_1 | class = y) * ... * P(x_n | class = y) * P(class = y) */
-
+  /* Calculates the classification probabilities for a single vector with P(y | x_1, x_2, ..., x_n) = P(y) * P(x_1 | y) * P(x_2 | y) * ... * P(x_n | y). */
+  
   std::map<int, double> probabilities;
   std::map<int, std::vector<std::vector<double>>>::iterator it;
   int classification_value = 0;
@@ -252,9 +252,9 @@ std::map<int, double> calculate_classification_probabilities(std::map<int, std::
   {
 
     std::vector<std::vector<double>> entry = it->second;
-    probabilities[classification_value] = double_vector_list_lookup(entry,0,2) / (size); // P(class = y)
+    probabilities[classification_value] = double_vector_list_lookup(entry,0,2) / (size); // compute P(y)
 
-    for(int i = 1; i < row.size(); i++) // P(class = y | x_1, ..., x_n)
+    for(int i = 1; i < row.size(); i++) // compute P(x_1 | y) * P(x_2 | y) * ... * P(x_n | y)
     {
       double mean = double_vector_list_lookup(entry,i,0);
       double standard_deviation = double_vector_list_lookup(entry,i,1);
@@ -281,7 +281,7 @@ std::map<int, double> calculate_classification_probabilities(std::map<int, std::
 int predict(std::map<int, std::vector<std::vector<double>>> summaries, Eigen::VectorXd row, int size, bool verbose)
 {
 
-  /* Returns classification prediction. */
+  /* Returns argmax classification prediction for Gaussian NB. */
 
   std::map<int, double> probabilities = calculate_classification_probabilities(summaries, row, size, verbose);
   std::map<int, double>::iterator it;
@@ -298,7 +298,7 @@ int predict(std::map<int, std::vector<std::vector<double>>> summaries, Eigen::Ve
     }
   }
 
-  return best_label;
+  return best_label; 
 }
 
 int get_max_feature_label(Eigen::VectorXd col)
@@ -321,7 +321,7 @@ int get_max_feature_label(Eigen::VectorXd col)
 int get_argmax(std::vector<double> probabilities,int len)
 {
 
-	/* Returns the argmax for probabilities i.e. the index of the largest probability*/
+	/* Returns the argmax for probabilities i.e. the index of the largest probability for Categorical NB. */
 
 	int max_idx = 0;
 	double max_prob = probabilities[0];
@@ -361,7 +361,7 @@ std::vector<int> categorical_naive_bayes_classifier(Eigen::MatrixXd validation, 
 
   /* Calculates the classification probabilities for each row in dataset and puts their predicted classification in a list. */
 
-  double alpha = 1.0; // for laplace smoothing
+  double alpha = 1.0; // for laplace smoothing (can be changed from 1, however 1 is most standard)
 
   if(verbose)
   {
@@ -371,7 +371,7 @@ std::vector<int> categorical_naive_bayes_classifier(Eigen::MatrixXd validation, 
   std::vector<int> predictions;
 
   // calculate class frequencies, then
-  // calculate overall classification probabilities i.e. compute q_j(y)
+  // calculate overall classification probabilities i.e. compute P(y)
 
   std::vector<Eigen::MatrixXd> class_matricies_list = matricies_by_classification(training, training_size, length);
 
@@ -444,7 +444,7 @@ std::vector<int> categorical_naive_bayes_classifier(Eigen::MatrixXd validation, 
 
 		for(int j = 1; j < max_label+1; j++)
 		{
-			// computes p_j(x|y) using laplace smoothing
+			// computes P(x_i | y) while utilizing laplace smoothing
 
 			col_labels[j] = (double) ((label_counts[j] + alpha) / (feature_column_length + alpha * class_matrix.rows())); 
 		}
@@ -457,7 +457,7 @@ std::vector<int> categorical_naive_bayes_classifier(Eigen::MatrixXd validation, 
   
   int mat_num = 0;
 
-  // now we can lookup: dict[y][x_n][feature] = p_j(x|y)
+  // now we can lookup: dict[y][x_n][feature] = P(x_i | y)
   // now compute the probability of each input vector belonging to a classification 
 
   for(int i = 0; i < validation_size; i++)
